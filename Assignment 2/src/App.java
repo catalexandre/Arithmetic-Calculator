@@ -11,12 +11,9 @@ public class App {
 
         System.out.println(input.nextLine());
 
-        while(input.hasNextLine())
-        {
-            String expressionString = input.nextLine();
+        System.out.println(calculate("^", "5", "3"));
 
-            evaluateExpression(expressionString);
-        }
+        
 
         System.out.println("done");
 
