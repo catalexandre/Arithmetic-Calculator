@@ -1,9 +1,12 @@
-import java.util.EmptyStackException;
+public class Stack<T> {
+    private T[] s;
+    private int t;
 
-public class Stack<E> {
-    
-    private E S[];
-    private int t = -1;
+    public Stack(int capacity)
+    {
+        t = -1;
+        s = (T[]) (new Object[capacity]);
+    }
 
     public int size()
     {
@@ -17,23 +20,54 @@ public class Stack<E> {
         else return false;
     }
 
-    public void push(E item)
+    public void push(T item)
     {
-        S[t + 1] = item;
+        if(s.length - 1 < t + 1)
+        {
+            expand();
+        }
+
+        s[t + 1] = item;
     }
 
-    public E pop() throws EmptyStackException
+    public T peek()
     {
         if(isEmpty())
         {
-            throw new EmptyStackException();
+            System.out.println("Empty stack");
+            return null;
         }
 
         else
         {
-            t--;
-            return S[t + 1];
+            return s[t];
         }
+    }
+
+    public T pop()
+    {
+        if(isEmpty())
+        {
+            System.out.println("Empty stack");
+            return null;
+        }
+
+        else
+        {
+            return s[t--];
+        }
+    }
+
+    private void expand()
+    {
+        T[] largerStack = (T[]) (new Object[s.length * 2]);
+        
+        for(int i = 0; i < s.length; i++)
+        {
+            largerStack[i] = s[i];
+        }
+
+        s = largerStack;
     }
 
 }
