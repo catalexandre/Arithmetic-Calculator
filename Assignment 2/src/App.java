@@ -3,8 +3,8 @@ import java.util.Scanner;
 
 public class App {
 
-    Stack operationStack = new Stack<String>(1);
-    Stack valueStack = new Stack<String>(1);
+    static Stack<String> operatorStack = new Stack<String>(1);
+    static Stack<String> valueStack = new Stack<String>(1);
     public static void main(String[] args) throws Exception {
 
         Scanner input = new Scanner(new FileInputStream("input.txt"));
@@ -15,6 +15,8 @@ public class App {
         {
             String expressionString = input.nextLine();
         }
+
+        input.close();
     }
 
     public static int precedence(String operator)
@@ -51,28 +53,136 @@ public class App {
             p = 6;
         }
 
+        else if(operator.equals("$"))
+        {
+            p = 7;
+        }
+
         else p = 0;
 
         return p;
     }
 
-    public static String evaluateExpression(String expression)
+    public static void evaluateExpression(String expression)
     {
-        String result;
         Scanner expressionScanner = new Scanner(expression);
 
         while(expressionScanner.hasNext())
         {
             String token = expressionScanner.next();
 
-            if(token.ch)
+            if(isNumber(token))
+            {
+                valueStack.push(token);
+            }
+
+            else 
+            {
+                repeatOperations(token);
+                operatorStack.push(token);
+            }
         }
 
-        return result;
+        expressionScanner.close();
     }
 
-    public static isNumber()
+    public static boolean isNumber(String s)
     {
+        boolean number = true;
+
+        for (int i = 0; i < s.length(); i++) {
+            if (!Character.isDigit(s.charAt(i))) {
+                number = false;
+                break;
+            }
+        }
+
+        return number;
+    }
+
+    public static void repeatOperations(String referenceOperator)
+    {
+        while(valueStack.size() > 1 && precedence(referenceOperator) <= precedence(operatorStack.peek()))
+        {
+            performOperation();
+        }
+    }
+
+    public static void performOperation()
+    {
+        String x = valueStack.pop();
+        String y = valueStack.pop();
+        String operator = operatorStack.pop();
+        valueStack.push(calculate(operator, x, y));
+    }
+
+    private static String calculate(String operator, String x, String y)
+    {
+        if(operator.equals("^"))
+        {
+            return String.valueOf(power(Integer.parseInt(x), Integer.parseInt(y)));
+        }   
+
+        else if(operator.equals("*"))
+        {
+            return String.valueOf(Integer.parseInt(x) * Integer.parseInt(y));
+        }
         
+        else if(operator.equals("/"))
+        {
+            return String.valueOf(Integer.parseInt(x) / Integer.parseInt(y));
+        }
+        
+        else if(operator.equals("+"))
+        {
+            return String.valueOf(Integer.parseInt(x) + Integer.parseInt(y));
+        }
+        
+        else if(operator.equals("-"))
+        {
+            return String.valueOf(Integer.parseInt(x) - Integer.parseInt(x));
+        }
+        
+        else if(operator.equals(">"))
+        {
+            return (Integer.parseInt(x) > Integer.parseInt(y)) ? "T" : "F";
+        }
+        
+        else if(operator.equals(">="))
+        {
+            return (Integer.parseInt(x) >= Integer.parseInt(y)) ? "T" : "F";
+        }
+        
+        else if(operator.equals("<"))
+        {
+            return (Integer.parseInt(x) < Integer.parseInt(y)) ? "T" : "F";
+        }
+        
+        else if(operator.equals("<="))
+        {
+            return (Integer.parseInt(x) <= Integer.parseInt(y)) ? "T" : "F";
+        }
+
+        else if(operator.equals("=="))
+        {
+            return (Integer.parseInt(x) == Integer.parseInt(y)) ? "T" : "F";
+        }
+
+        else if(operator.equals("!="))
+        {
+            return (Integer.parseInt(x) != Integer.parseInt(y)) ? "T" : "F";
+        }
+
+        else return "Invalid";
+    }
+
+    private static int power(int x, int y)
+    {
+        if(y == 1)
+        {
+            return x;
+        }
+
+        else return x * power(x, y - 1);
     }
 }
