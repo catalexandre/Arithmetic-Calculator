@@ -3,8 +3,8 @@ import java.util.Scanner;
 
 public class App {
 
-    static Stack<String> operatorStack = new Stack<String>(1);
-    static Stack<String> valueStack = new Stack<String>(1);
+    static Stack<String> operatorStack;
+    static Stack<String> valueStack;
     public static void main(String[] args) throws Exception {
 
         Scanner input = new Scanner(new FileInputStream("input.txt"));
@@ -14,7 +14,11 @@ public class App {
         while(input.hasNextLine())
         {
             String expressionString = input.nextLine();
+
+            evaluateExpression(expressionString);
         }
+
+        System.out.println("done");
 
         input.close();
     }
@@ -67,6 +71,9 @@ public class App {
     {
         Scanner expressionScanner = new Scanner(expression);
 
+        valueStack = new Stack<String>(1);
+        operatorStack = new Stack<String>(1);
+
         while(expressionScanner.hasNext())
         {
             String token = expressionScanner.next();
@@ -82,6 +89,8 @@ public class App {
                 operatorStack.push(token);
             }
         }
+
+        System.out.println(valueStack.peek());
 
         expressionScanner.close();
     }
