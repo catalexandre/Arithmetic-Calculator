@@ -27,7 +27,7 @@ public class Stack<T> {
             expand();
         }
 
-        s[t + 1] = item;
+        s[++t] = item;
     }
 
     public T peek()

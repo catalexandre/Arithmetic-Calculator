@@ -1,5 +1,6 @@
 import java.io.FileInputStream;
 import java.util.Scanner;
+import java.io.FileOutputStream;
 
 public class App {
 
@@ -7,17 +8,7 @@ public class App {
     static Stack<String> valueStack;
     public static void main(String[] args) throws Exception {
 
-        Scanner input = new Scanner(new FileInputStream("input.txt"));
-
-        System.out.println(input.nextLine());
-
-        System.out.println(calculate("^", "5", "3"));
-
-        
-
-        System.out.println("done");
-
-        input.close();
+        System.out.println(evaluateExpression("( 2 + 5 ) * -7"));
     }
 
     public static int precedence(String operator)
@@ -26,17 +17,17 @@ public class App {
 
         if(operator.equals("(") || operator.equals(")"))
         {
-            p = 1;
+            p = 7;
         }
 
         else if(operator.equals("^"))
         {
-            p = 2;
+            p = 6;
         }
 
         else if(operator.equals("*") || operator.equals("/"))
         {
-            p = 3;
+            p = 5;
         }
 
         else if(operator.equals("+") || operator.equals("-"))
@@ -46,17 +37,17 @@ public class App {
 
         else if(operator.equals("<") || operator.equals("<=") || operator.equals(">") || operator.equals(""))
         {
-            p = 5;
+            p = 3;
         }
 
         else if(operator.equals("==") || operator.equals("!="))
         {
-            p = 6;
+            p = 2;
         }
 
         else if(operator.equals("$"))
         {
-            p = 7;
+            p = 1;
         }
 
         else p = 0;
@@ -64,7 +55,7 @@ public class App {
         return p;
     }
 
-    public static void evaluateExpression(String expression)
+    public static String evaluateExpression(String expression)
     {
         Scanner expressionScanner = new Scanner(expression);
 
@@ -87,9 +78,11 @@ public class App {
             }
         }
 
-        System.out.println(valueStack.peek());
+        repeatOperations("$");
 
         expressionScanner.close();
+
+        return valueStack.peek();
     }
 
     public static boolean isNumber(String s)
@@ -97,7 +90,13 @@ public class App {
         boolean number = true;
 
         for (int i = 0; i < s.length(); i++) {
-            if (!Character.isDigit(s.charAt(i))) {
+            if (i == 0 && s.charAt(i) == '-')
+            {
+                continue;
+            }
+
+            if (!Character.isDigit(s.charAt(i))) 
+            {
                 number = false;
                 break;
             }
@@ -108,7 +107,7 @@ public class App {
 
     public static void repeatOperations(String referenceOperator)
     {
-        while(valueStack.size() > 1 && precedence(referenceOperator) <= precedence(operatorStack.peek()))
+        while((valueStack.size() > 1 && precedence(referenceOperator) <= precedence(operatorStack.peek())) || (referenceOperator.equals(")") && !operatorStack.peek().equals("(")))
         {
             performOperation();
         }
@@ -116,8 +115,8 @@ public class App {
 
     public static void performOperation()
     {
-        String x = valueStack.pop();
         String y = valueStack.pop();
+        String x = valueStack.pop();
         String operator = operatorStack.pop();
         valueStack.push(calculate(operator, x, y));
     }
@@ -126,63 +125,63 @@ public class App {
     {
         if(operator.equals("^"))
         {
-            return String.valueOf(power(Integer.parseInt(x), Integer.parseInt(y)));
+            return String.valueOf(power(Double.parseDouble(x), Integer.parseInt(y)));
         }   
 
         else if(operator.equals("*"))
         {
-            return String.valueOf(Integer.parseInt(x) * Integer.parseInt(y));
+            return String.valueOf(Double.parseDouble(x) * Double.parseDouble(y));
         }
         
         else if(operator.equals("/"))
         {
-            return String.valueOf(Integer.parseInt(x) / Integer.parseInt(y));
+            return String.valueOf(Double.parseDouble(x) / Double.parseDouble(y));
         }
         
         else if(operator.equals("+"))
         {
-            return String.valueOf(Integer.parseInt(x) + Integer.parseInt(y));
+            return String.valueOf(Double.parseDouble(x) + Double.parseDouble(y));
         }
         
         else if(operator.equals("-"))
         {
-            return String.valueOf(Integer.parseInt(x) - Integer.parseInt(x));
+            return String.valueOf(Double.parseDouble(x) - Double.parseDouble(y));
         }
         
         else if(operator.equals(">"))
         {
-            return (Integer.parseInt(x) > Integer.parseInt(y)) ? "T" : "F";
+            return (Double.parseDouble(x) > Double.parseDouble(y)) ? "T" : "F";
         }
         
         else if(operator.equals(">="))
         {
-            return (Integer.parseInt(x) >= Integer.parseInt(y)) ? "T" : "F";
+            return (Double.parseDouble(x) >= Double.parseDouble(y)) ? "T" : "F";
         }
         
         else if(operator.equals("<"))
         {
-            return (Integer.parseInt(x) < Integer.parseInt(y)) ? "T" : "F";
+            return (Double.parseDouble(x) < Double.parseDouble(y)) ? "T" : "F";
         }
         
         else if(operator.equals("<="))
         {
-            return (Integer.parseInt(x) <= Integer.parseInt(y)) ? "T" : "F";
+            return (Double.parseDouble(x) <= Double.parseDouble(y)) ? "T" : "F";
         }
 
         else if(operator.equals("=="))
         {
-            return (Integer.parseInt(x) == Integer.parseInt(y)) ? "T" : "F";
+            return (Double.parseDouble(x) == Double.parseDouble(y)) ? "T" : "F";
         }
 
         else if(operator.equals("!="))
         {
-            return (Integer.parseInt(x) != Integer.parseInt(y)) ? "T" : "F";
+            return (Double.parseDouble(x) != Double.parseDouble(y)) ? "T" : "F";
         }
 
         else return "Invalid";
     }
 
-    private static int power(int x, int y)
+    private static double power(double x, int y)
     {
         if(y == 1)
         {
