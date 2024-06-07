@@ -83,17 +83,9 @@ public class App {
                 valueStack.push(token);
             }
 
-            else if(token.equals("("))
+            else if(token.equals(")"))
             {
-                operatorStack.push(token);
-            }
-
-            else if (token.equals(")")) 
-            {
-                while (!operatorStack.isEmpty() && !operatorStack.peek().equals("(")) 
-                {
-                    performOperation();
-                }
+                repeatOperations(token);
                 operatorStack.pop();
             }
 
@@ -133,7 +125,7 @@ public class App {
 
     public static void repeatOperations(String referenceOperator)
     {
-        while(valueStack.size() > 1 && precedence(referenceOperator) <= precedence(operatorStack.peek()))
+        while((valueStack.size() > 1 && !operatorStack.peek().equals("(")) && precedence(referenceOperator) <= precedence(operatorStack.peek()) || (referenceOperator.equals(")") && !operatorStack.peek().equals("(")))
         {
             performOperation();
         }
@@ -151,7 +143,7 @@ public class App {
     {
         if(operator.equals("^"))
         {
-            return String.valueOf(power(Double.parseDouble(x), Integer.parseInt(y)));
+            return String.valueOf(power(Double.parseDouble(x), Double.parseDouble(y)));
         }   
 
         else if(operator.equals("*"))
@@ -207,9 +199,9 @@ public class App {
         else return "Invalid";
     }
 
-    private static double power(double x, int y)
+    private static double power(double x, double y)
     {
-        if(y == 1)
+        if(y <= 1)
         {
             return x;
         }
