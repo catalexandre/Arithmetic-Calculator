@@ -1,6 +1,7 @@
 import java.io.FileInputStream;
 import java.util.Scanner;
 import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 public class App {
 
@@ -8,12 +9,25 @@ public class App {
     static Stack<String> valueStack;
     public static void main(String[] args) throws Exception {
 
-        System.out.println(evaluateExpression("( 2 + 5 ) * -7"));
+        Scanner input = new Scanner(new FileInputStream("input.txt"));
+        PrintWriter output = new PrintWriter(new FileOutputStream("output.txt"));
+
+        while(input.hasNextLine())
+        {
+            String expression = input.nextLine();
+
+            output.write(expression + "\n");
+            output.write("= " + evaluateExpression(expression) + "\n");
+        }
+
+        input.close();
+        output.close();
+
     }
 
     public static int precedence(String operator)
     {
-        int p;
+        int p = 0;
 
         if(operator.equals("(") || operator.equals(")"))
         {
@@ -35,7 +49,7 @@ public class App {
             p = 4;
         }
 
-        else if(operator.equals("<") || operator.equals("<=") || operator.equals(">") || operator.equals(""))
+        else if(operator.equals("<") || operator.equals("<=") || operator.equals(">") || operator.equals(">="))
         {
             p = 3;
         }
@@ -49,8 +63,6 @@ public class App {
         {
             p = 1;
         }
-
-        else p = 0;
 
         return p;
     }
@@ -69,6 +81,20 @@ public class App {
             if(isNumber(token))
             {
                 valueStack.push(token);
+            }
+
+            else if(token.equals("("))
+            {
+                operatorStack.push(token);
+            }
+
+            else if (token.equals(")")) 
+            {
+                while (!operatorStack.isEmpty() && !operatorStack.peek().equals("(")) 
+                {
+                    performOperation();
+                }
+                operatorStack.pop();
             }
 
             else 
@@ -90,7 +116,7 @@ public class App {
         boolean number = true;
 
         for (int i = 0; i < s.length(); i++) {
-            if (i == 0 && s.charAt(i) == '-')
+            if ((i == 0 && s.charAt(i) == '-' && s.length() > 1) || s.charAt(i) == '.')
             {
                 continue;
             }
@@ -107,7 +133,7 @@ public class App {
 
     public static void repeatOperations(String referenceOperator)
     {
-        while((valueStack.size() > 1 && precedence(referenceOperator) <= precedence(operatorStack.peek())) || (referenceOperator.equals(")") && !operatorStack.peek().equals("(")))
+        while(valueStack.size() > 1 && precedence(referenceOperator) <= precedence(operatorStack.peek()))
         {
             performOperation();
         }
